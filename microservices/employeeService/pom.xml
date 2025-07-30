@@ -11,9 +11,9 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>serviceRegistry1</artifactId>
+	<artifactId>employeeService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>serviceRegistry1</name>
+	<name>employeeService</name>
 	<description>Spring Boot Eureka Server</description>
 
 	<dependencies>
