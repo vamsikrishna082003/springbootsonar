@@ -6,26 +6,28 @@ import com.example.employeeservice.exception.NotFoundException;
 import com.example.employeeservice.model.Employee;
 import com.example.employeeservice.repository.EmployeeRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final EmployeeRepository employeeRepository;
+    private final ModelMapper modelMapper;
+
+
+    public EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
+        this.employeeRepository = employeeRepository;
+        this.modelMapper = modelMapper;
+    }
 
     public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeRepository.findAll()
                 .stream()
                 .map(emp -> modelMapper.map(emp, EmployeeResponseDTO.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public EmployeeResponseDTO saveEmployee(EmployeeRequestDTO requestDTO) {

@@ -89,7 +89,8 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()); // Will pass unless validation annotations are added
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.name").exists());
     }
 
     @Test

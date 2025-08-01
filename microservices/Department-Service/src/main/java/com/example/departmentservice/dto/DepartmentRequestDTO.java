@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class DepartmentRequestDTO {
 
-    @NotBlank
+    @NotBlank(message = "Name must not be blank")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Code must not be blank")
     private String code;
 }

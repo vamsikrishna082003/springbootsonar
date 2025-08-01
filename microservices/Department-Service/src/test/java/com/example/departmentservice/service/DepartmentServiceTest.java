@@ -124,5 +124,4 @@ public class DepartmentServiceTest {
         assertNotNull(mapped);
     }
 
-
 }
