@@ -2,6 +2,7 @@ package com.example.departmentservice.controller;
 
 import com.example.departmentservice.dto.DepartmentRequestDTO;
 import com.example.departmentservice.dto.DepartmentResponseDTO;
+import com.example.departmentservice.exception.ResourceNotFoundException;
 import com.example.departmentservice.service.DepartmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -72,7 +73,7 @@ public class DepartmentControllerTest {
         response.setName("Admin");
         response.setCode("ADM-01");
 
-        when(departmentService.getById(1L)).thenReturn(Optional.of(response));
+        when(departmentService.getById(1L)).thenReturn(response);
 
         mockMvc.perform(get("/api/departments/1"))
                 .andExpect(status().isOk())
@@ -81,10 +82,12 @@ public class DepartmentControllerTest {
 
     @Test
     void testGetDepartmentById_NotFound() throws Exception {
-        when(departmentService.getById(99L)).thenReturn(Optional.empty());
+        when(departmentService.getById(99L))
+                .thenThrow(new ResourceNotFoundException("Department not found with ID: 99"));
 
         mockMvc.perform(get("/api/departments/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Department not found with ID: 99"));
     }
 
     @Test

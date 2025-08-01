@@ -31,10 +31,9 @@ public class DepartmentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentResponseDTO> get(@PathVariable Long id) {
-        return departmentService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(departmentService.getById(id));
     }
+
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
