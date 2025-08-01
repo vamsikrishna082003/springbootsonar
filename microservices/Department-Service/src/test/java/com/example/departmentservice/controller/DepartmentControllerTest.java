@@ -2,6 +2,7 @@ package com.example.departmentservice.controller;
 
 import com.example.departmentservice.dto.DepartmentRequestDTO;
 import com.example.departmentservice.dto.DepartmentResponseDTO;
+import com.example.departmentservice.exception.GlobalExceptionHandler;
 import com.example.departmentservice.exception.ResourceNotFoundException;
 import com.example.departmentservice.service.DepartmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,7 +22,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @WebMvcTest(DepartmentController.class)
+@Import(GlobalExceptionHandler.class)
 public class DepartmentControllerTest {
 
     @Autowired
@@ -95,4 +99,29 @@ public class DepartmentControllerTest {
         mockMvc.perform(delete("/api/departments/1"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void testCreateDepartment_InvalidRequest_ShouldReturnBadRequest() throws Exception {
+        // Invalid request with missing fields
+        String invalidJson = "{ \"name\": \"\", \"code\": \"\" }";
+
+        mockMvc.perform(post("/api/departments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.code").exists());
+    }
+
+    @Test
+    void testGetDepartmentById_InternalError_ShouldReturn500() throws Exception {
+        // Force service to throw unexpected exception
+        when(departmentService.getById(1L)).thenThrow(new RuntimeException("Unexpected Error"));
+
+        mockMvc.perform(get("/api/departments/1"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Unexpected Error"));
+    }
+
+
 }
