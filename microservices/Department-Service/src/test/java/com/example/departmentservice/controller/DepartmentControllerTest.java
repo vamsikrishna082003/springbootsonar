@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(DepartmentController.class)
+@WebMvcTest(controllers = DepartmentController.class)
 @Import(GlobalExceptionHandler.class)
-public class DepartmentControllerTest {
+  class DepartmentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

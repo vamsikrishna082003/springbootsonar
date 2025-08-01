@@ -17,7 +17,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class DepartmentServiceTest {
+ class DepartmentServiceTest {
 
     @Mock
     private DepartmentRepository departmentRepository;
@@ -123,5 +123,6 @@ public class DepartmentServiceTest {
         DepartmentResponseDTO mapped = modelMapper.map(department, DepartmentResponseDTO.class);
         assertNotNull(mapped);
     }
+
 
 }
