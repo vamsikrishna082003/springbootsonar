@@ -5,27 +5,26 @@ import com.example.departmentservice.dto.DepartmentResponseDTO;
 import com.example.departmentservice.model.Department;
 import com.example.departmentservice.repository.DepartmentRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.departmentservice.exception.ResourceNotFoundException;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService {
 
-    @Autowired
-    private DepartmentRepository departmentRepository;
+    private final DepartmentRepository departmentRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    public DepartmentService(DepartmentRepository departmentRepository, ModelMapper modelMapper) {
+        this.departmentRepository = departmentRepository;
+        this.modelMapper = modelMapper;
+    }
 
     public List<DepartmentResponseDTO> getAllDepartments() {
         return departmentRepository.findAll()
                 .stream()
                 .map(dept -> modelMapper.map(dept, DepartmentResponseDTO.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public DepartmentResponseDTO saveDepartment(DepartmentRequestDTO requestDTO) {

@@ -4,7 +4,6 @@ import com.example.departmentservice.dto.DepartmentRequestDTO;
 import com.example.departmentservice.dto.DepartmentResponseDTO;
 import com.example.departmentservice.service.DepartmentService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +15,11 @@ import java.util.List;
 @RequestMapping("/api/departments")
 public class DepartmentController {
 
-    @Autowired
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
+
+    public DepartmentController(DepartmentService departmentService) {
+        this.departmentService = departmentService;
+    }
 
     @GetMapping
     public List<DepartmentResponseDTO> getAll() {
