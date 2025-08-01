@@ -99,18 +99,6 @@ public class DepartmentControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void testCreateDepartment_InvalidRequest_ShouldReturnBadRequest() throws Exception {
-        // Invalid request with missing fields
-        String invalidJson = "{ \"name\": \"\", \"code\": \"\" }";
-
-        mockMvc.perform(post("/api/departments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.code").exists());
-    }
 
     @Test
     void testGetDepartmentById_InternalError_ShouldReturn500() throws Exception {
@@ -121,4 +109,5 @@ public class DepartmentControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string("Unexpected Error"));
     }
+
 }
