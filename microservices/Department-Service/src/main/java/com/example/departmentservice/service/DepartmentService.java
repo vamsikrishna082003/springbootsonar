@@ -7,7 +7,7 @@ import com.example.departmentservice.repository.DepartmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.departmentservice.exception.ResourceNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,9 +34,10 @@ public class DepartmentService {
         return modelMapper.map(saved, DepartmentResponseDTO.class);
     }
 
-    public Optional<DepartmentResponseDTO> getById(Long id) {
-        return departmentRepository.findById(id)
-                .map(dept -> modelMapper.map(dept, DepartmentResponseDTO.class));
+    public DepartmentResponseDTO getById(Long id) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with ID: " + id));
+        return modelMapper.map(department, DepartmentResponseDTO.class);
     }
 
     public void deleteById(Long id) {

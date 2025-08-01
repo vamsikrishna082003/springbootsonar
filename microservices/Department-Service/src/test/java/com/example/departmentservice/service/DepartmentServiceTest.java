@@ -2,6 +2,7 @@ package com.example.departmentservice.service;
 
 import com.example.departmentservice.dto.DepartmentRequestDTO;
 import com.example.departmentservice.dto.DepartmentResponseDTO;
+import com.example.departmentservice.exception.ResourceNotFoundException;
 import com.example.departmentservice.model.Department;
 import com.example.departmentservice.repository.DepartmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +63,7 @@ public class DepartmentServiceTest {
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
         when(modelMapper.map(department, DepartmentResponseDTO.class)).thenReturn(responseDTO);
 
-        DepartmentResponseDTO found = departmentService.getById(1L).orElse(null);
+        DepartmentResponseDTO found = departmentService.getById(1L);
         assertNotNull(found);
         assertEquals("Admin", found.getName());
     }
@@ -71,8 +72,11 @@ public class DepartmentServiceTest {
     void testGetDepartmentById_NotFound() {
         when(departmentRepository.findById(100L)).thenReturn(Optional.empty());
 
-        Optional<DepartmentResponseDTO> result = departmentService.getById(100L);
-        assertTrue(result.isEmpty());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            departmentService.getById(100L);
+        });
+
+        assertEquals("Department not found with ID: 100", exception.getMessage());
     }
 
     @Test
