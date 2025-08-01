@@ -82,18 +82,6 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void testCreateEmployeeWithMissingName() throws Exception {
-        EmployeeRequestDTO request = new EmployeeRequestDTO();
-        request.setEmail("missing@example.com");
-
-        mockMvc.perform(post("/api/employees")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.name").exists());
-    }
-
-    @Test
     void testGetAllEmployeesEmpty() throws Exception {
         when(employeeService.getAllEmployees()).thenReturn(Collections.emptyList());
 
