@@ -3,13 +3,16 @@ package com.example.employeeservice.controller;
 import com.example.employeeservice.dto.EmployeeRequestDTO;
 import com.example.employeeservice.dto.EmployeeResponseDTO;
 import com.example.employeeservice.service.EmployeeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
@@ -17,13 +20,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = EmployeeController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class EmployeeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private EmployeeService employeeService;
 
     @Autowired
@@ -88,5 +92,16 @@ class EmployeeControllerTest {
         mockMvc.perform(get("/api/employees"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+    }
+
+    /**
+     * Test configuration to mock the service bean and inject it
+     */
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public EmployeeService employeeService() {
+            return Mockito.mock(EmployeeService.class);
+        }
     }
 }
