@@ -8,32 +8,43 @@ import com.example.departmentservice.service.DepartmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @WebMvcTest(controllers = DepartmentController.class)
-@Import(GlobalExceptionHandler.class)
-  class DepartmentControllerTest {
+@Import({GlobalExceptionHandler.class, DepartmentControllerTest.TestConfig.class})
+class DepartmentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private DepartmentService departmentService;
-
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private DepartmentService departmentService;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public DepartmentService departmentService() {
+            return Mockito.mock(DepartmentService.class);
+        }
+    }
 
     @Test
     void testGetAllDepartments() throws Exception {
@@ -60,13 +71,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         response.setName("IT");
         response.setCode("IT-01");
 
-        when(departmentService.saveDepartment(request)).thenReturn(response);
+        when(departmentService.saveDepartment(any(DepartmentRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("IT"));
+                .andExpect(jsonPath("$.name").value("IT"))
+                .andExpect(jsonPath("$.code").value("IT-01"));
     }
 
     @Test
@@ -80,7 +92,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         mockMvc.perform(get("/api/departments/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Admin"));
+                .andExpect(jsonPath("$.name").value("Admin"))
+                .andExpect(jsonPath("$.code").value("ADM-01"));
     }
 
     @Test
@@ -95,13 +108,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void testDeleteDepartment() throws Exception {
+        doNothing().when(departmentService).deleteById(1L);
+
         mockMvc.perform(delete("/api/departments/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void testGetDepartmentById_InternalError_ShouldReturn500() throws Exception {
-        // Force service to throw unexpected exception
         when(departmentService.getById(1L)).thenThrow(new RuntimeException("Unexpected Error"));
 
         mockMvc.perform(get("/api/departments/1"))
