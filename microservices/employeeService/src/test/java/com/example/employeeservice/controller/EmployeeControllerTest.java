@@ -2,6 +2,7 @@ package com.example.employeeservice.controller;
 
 import com.example.employeeservice.dto.EmployeeRequestDTO;
 import com.example.employeeservice.dto.EmployeeResponseDTO;
+import com.example.employeeservice.exception.NotFoundException;
 import com.example.employeeservice.service.EmployeeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,4 +90,25 @@ class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
+    @Test
+    void testGetEmployeeByIdNotFound() throws Exception {
+        when(employeeService.getByIdOrThrow(99L))
+                .thenThrow(new NotFoundException("Employee not found"));
+
+        mockMvc.perform(get("/api/employees/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Employee not found"));
+    }
+
+    @Test
+    void testGenericExceptionHandling() throws Exception {
+        when(employeeService.getAllEmployees())
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        mockMvc.perform(get("/api/employees"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Something went wrong"));
+    }
+    
+
 }
