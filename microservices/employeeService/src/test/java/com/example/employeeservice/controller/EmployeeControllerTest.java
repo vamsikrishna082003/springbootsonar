@@ -3,14 +3,18 @@ package com.example.employeeservice.controller;
 import com.example.employeeservice.dto.EmployeeRequestDTO;
 import com.example.employeeservice.dto.EmployeeResponseDTO;
 import com.example.employeeservice.exception.NotFoundException;
+import com.example.employeeservice.exception.GlobalExceptionHandler;
 import com.example.employeeservice.service.EmployeeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
@@ -19,16 +23,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = EmployeeController.class)
+@Import({GlobalExceptionHandler.class, EmployeeControllerTest.TestConfig.class})
+
 class EmployeeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private EmployeeService employeeService;
-
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public EmployeeService employeeService() {
+            return Mockito.mock(EmployeeService.class);
+        }
+    }
 
     @Test
     void testGetAllEmployees() throws Exception {
@@ -52,7 +66,7 @@ class EmployeeControllerTest {
         response.setId(2L);
         response.setName("Alice");
 
-        when(employeeService.saveEmployee(request)).thenReturn(response);
+        when(employeeService.saveEmployee(any(EmployeeRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
